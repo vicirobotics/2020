@@ -1,0 +1,154 @@
+#include <kipr/botball.h>
+   
+  void correct_left(); 
+  void correct_right();
+  void turn_right_ninety();
+  void turn_left_ninety();
+  void drive_forward(int milliseconds);
+  void drive_backward(int milliseconds);
+
+int main() 
+  {
+  wait_for_light(3);
+  shut_down_in(115);
+  
+  msleep(7000);
+  
+  
+  enable_servos();
+  set_servo_position(0, 1900);
+  msleep(1500);
+
+  // Drive Forward out of starting position to first turn
+  drive_forward(5900);
+  
+  
+  // Turn Right toward wall
+  turn_right_ninety();
+  ao();
+  msleep(500);
+  
+  drive_forward(2800);
+  
+  // Drive Forward and stop at wall //3800
+  while (analog(2) > 3800) {   
+	mav(0, 500); //right motor
+	mav(3, 500); //left motor
+  }
+  ao();  // Stop at wall after tophat sensor senses wall
+  msleep(500);
+  
+  // Turn left toward ramp //1300
+  turn_left_ninety(1350);
+  
+  
+  // Drive toward ramp faster than normal
+  mav(0, 1500); //left motor
+  mav(3, 1500); //right motor
+  msleep(1500);  //2500
+ 
+// Use line following routine within tophat sensor loop to get up ramp
+ while (analog(2) > 3300) {
+      if (analog(1) > 3200)     // right sensor if on tape correct right 
+      {       
+        correct_right();
+      } 
+      else if (analog(0) > 3200)    {  //left sensor if on tape correct left         
+        correct_left();
+      }
+      else {			//Drive Straight
+        mav(3, 1000);
+        mav(0, 1000);
+        msleep(500);
+      }
+      
+    }
+    ao();  // Stop at top after tophat sensor senses wall
+    
+  set_servo_position(0, 75);
+  msleep(1000);
+  
+  drive_forward(1900);
+  msleep(500);
+  
+  drive_backward(200);
+  msleep(850);
+  
+// Turn left toward cubes
+  turn_left_ninety(850);
+  msleep(500);
+  
+  //Square with back pvc
+  drive_backward(2300);
+  
+  
+   while (analog(2) > 3500) {   //normal value 3500
+      if (analog(1) > 3000)     // right sensor if on tape correct right 
+      {  
+        mav(0,0);
+        mav(3,500);
+        msleep(100);
+      } 
+      else if (analog(0) > 3000)    {  //left sensor if on tape correct left         
+        mav(0,500);
+        mav(3,0);
+        msleep(100);
+      }
+      else {			//Drive Straight
+        mav(3, 100);
+        mav(0, 100);
+        msleep(200);
+      }
+      //msleep(100); //slows loop to 1/10 second interval
+    }
+    ao();  // Stop at top after tophat sensor senses wall
+  
+  mav(0, 540);
+  mav(3, 500);
+  msleep(6650); //6700
+  
+  ao();
+  
+  set_servo_position(0, 1900);
+  msleep(2000);
+  
+  
+// End Program  
+    return 0;
+} 
+	
+void correct_right() {   
+  // Turn arc left.   
+  mav(0, 500);   
+  mav(3, 900);
+  msleep(300);
+} 
+void correct_left() {   
+  mav(0, 900);   
+  mav(3, 500);
+  msleep(300);
+}
+
+void turn_right_ninety() {
+  mav(0, -500);
+  mav(3, 1000);
+  msleep(1400);
+}
+
+void turn_left_ninety(int milliseconds) {
+  mav(0, 1000);
+  mav(3, -500);
+  msleep(milliseconds); //1300
+}
+
+void drive_forward(int milliseconds) {   
+  mav(0, 1400);   
+  mav(3, 1400); // originally 1400
+  msleep(milliseconds);
+}
+
+void drive_backward(int milliseconds) {   
+  mav(0, -200);   
+  mav(3, -200);
+  msleep(milliseconds);
+}
