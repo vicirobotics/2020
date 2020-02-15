@@ -79,7 +79,7 @@ int main()
   msleep(500);
   
   //Square with back pvc
-  drive_backward(2300);
+  drive_backward(2000);
   
   
    while (analog(2) > 3500) {   //normal value 3500
